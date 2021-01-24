@@ -1,20 +1,29 @@
 import { Router } from 'express';
 import multer from 'multer';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
-import CreateUserService from '../services/CreateUserService';
-import uploadConfig from '../config/upload';
-import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
+import uploadConfig from '@config/upload';
+import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService';
+import CreateUserService from '@modules/users/services/CreateUserService';
+
+import { container } from 'tsyringe';
+
+
+
 
 const usersRouter = Router();
+
 const upload = multer(uploadConfig);
 
 usersRouter.post('/', async (request, response) => {
     const { email, password, name } = request.body;
 
-    const createUser = new CreateUserService();
+
+
+    const createUser = container.resolve(CreateUserService);
 
     const user = await createUser.execute({ email, password, name });
 
+    /* @ts-ignore */
     delete user.password;
 
     return response.status(200).json(user);
@@ -29,7 +38,8 @@ usersRouter.patch(
 
         const { id } = request.user;
 
-        const updateUserAvatar = new UpdateUserAvatarService();
+
+        const updateUserAvatar = container.resolve(UpdateUserAvatarService);
 
         const updatedAvatar = await updateUserAvatar.execute({
             user_id: id,
