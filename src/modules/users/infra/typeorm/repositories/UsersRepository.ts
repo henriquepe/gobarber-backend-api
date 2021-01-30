@@ -12,20 +12,17 @@ export default class UsersRepository implements IUsersRepository {
         this.ormRepository = getRepository(User);
     }
 
-    public async findByEmail(email: string): Promise<User> {
+    public async findByEmail(email: string): Promise<User | undefined> {
 
         const user = await this.ormRepository.findOne({ where: { email } })
 
-        if (!user) {
-            throw new AppError('user do not exists', 401);
-        }
 
         return user;
 
     }
 
     public async save(user: User): Promise<User> {
-        this.ormRepository.save(user);
+        await this.ormRepository.save(user);
 
         return user;
     }
@@ -38,7 +35,7 @@ export default class UsersRepository implements IUsersRepository {
             password
         });
 
-        this.save(user)
+        await this.save(user)
 
         return user;
 

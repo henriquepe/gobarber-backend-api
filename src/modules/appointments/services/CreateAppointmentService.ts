@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { startOfHour } from 'date-fns';
 import AppError from '../../../shared/errors/AppError';
 import Appointment from '../infra/typeorm/entities/Appointment';
@@ -34,7 +36,7 @@ class CreateAppointmentService {
             throw new AppError('This appointment is already booked!', 401);
         }
 
-        const appointment = this.appointmentsRepository.create({
+        const appointment = await this.appointmentsRepository.create({
             provider_id,
             date: appointmentDate,
         });
