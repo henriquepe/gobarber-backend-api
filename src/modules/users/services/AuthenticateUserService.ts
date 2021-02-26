@@ -5,6 +5,7 @@ import authConfig from '../../../config/authConfig';
 import AppError from '../../../shared/errors/AppError';
 import IUsersRepository from '../repositories/IUsersRepository';
 import { injectable, inject } from 'tsyringe';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
 interface IRequest {
     email: string;
@@ -21,7 +22,11 @@ class AuthenticateUserService {
 
     constructor(
         @inject('UsersRepository')
-        private usersRepository: IUsersRepository) {
+        private usersRepository: IUsersRepository,
+
+        @inject('HashProvider')
+        private hashProvider: IHashProvider
+        ) {
 
     }
 
@@ -34,7 +39,7 @@ class AuthenticateUserService {
             throw new AppError('User not exists', 401);
         }
 
-        const passwordMatched = await compare(password, user.password);
+        const passwordMatched = await this.hashProvider.compareHash(password, user.password );
 
         if (!passwordMatched) {
             throw new AppError('invalid email or password', 401);
